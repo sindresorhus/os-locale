@@ -40,7 +40,9 @@ module.exports = function (cb) {
 				return;
 			}
 
-			cache = getLocale(/LANG="([^"]*)"/.exec(stdout)[1]);
+			var res = /(?:LC_ALL|LANG|LC_MESSAGES|LC_CTYPE|)="([^"]{2,})"/.exec(stdout);
+
+			cache = getLocale(res && res[1]);
 			cb(null, cache);
 		});
 	}
