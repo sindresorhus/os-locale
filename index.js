@@ -28,6 +28,7 @@ module.exports = function (cb) {
 				cb(err);
 				return;
 			}
+
 			cache = stdout.trim() || 'en_US';
 			cb(null, cache);
 		});
@@ -55,10 +56,11 @@ module.exports = function (cb) {
 
 			if (!res && process.platform === 'darwin') {
 				getAppleLocale();
-			} else {
-				cache = getLocale(res && res[1]);
-				cb(null, cache);
+				return;
 			}
+
+			cache = getLocale(res && res[1]);
+			cb(null, cache);
 		});
 	}
 };
