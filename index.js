@@ -22,6 +22,17 @@ module.exports = function (cb) {
 		return;
 	}
 
+	var getAppleLocale = function () {
+		childProcess.execFile('defaults', ['read', '-g', 'AppleLocale'], function (err, stdout) {
+			if (err) {
+				cb(err);
+				return;
+			}
+			cache = stdout.trim() || 'en_US';
+			cb(null, cache);
+		});
+	};
+
 	if (process.platform === 'win32') {
 		childProcess.execFile('wmic', ['os', 'get', 'locale'], function (err, stdout) {
 			if (err) {
@@ -42,8 +53,12 @@ module.exports = function (cb) {
 
 			var res = /(?:LC_ALL|LANG|LC_MESSAGES|LC_CTYPE|)="([^"]{2,})"/.exec(stdout);
 
-			cache = getLocale(res && res[1]);
-			cb(null, cache);
+			if (!res && process.platform === 'darwin') {
+				getAppleLocale();
+			} else {
+				cache = getLocale(res && res[1]);
+				cb(null, cache);
+			}
 		});
 	}
 };
