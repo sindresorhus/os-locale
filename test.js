@@ -7,6 +7,7 @@ test(function (t) {
 
 	osLocale(function (err, locale) {
 		console.log('Locale identifier:', locale);
+		t.assert(!err, err);
 		t.assert(locale.length > 1);
 		t.assert(locale.indexOf('_') !== -1);
 	});
