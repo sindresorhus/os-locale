@@ -4,21 +4,24 @@ var execFileSync = require('exec-file-sync');
 var lcid = require('lcid');
 var cache;
 
+function getEnvLocale() {
+	var env = process.env;
+	var ret = env.LC_ALL || env.LANGUAGE || env.LANG || env.LC_MESSAGES;
+	cache = getLocale(ret);
+	return ret;
+}
+
+function parseLocale(x) {
+	var res = /(?:LC_ALL|LANG|LC_MESSAGES|LC_CTYPE|)="([^"]{2,})"/.exec(x);
+	return res && res[1];
+}
+
 function getLocale(str) {
-	return str.replace(/[.:].*/, '') || 'en_US';
+	return (str && str.replace(/[.:].*/, '')) || 'en_US';
 }
 
 module.exports = function (cb) {
-	if (cache) {
-		setImmediate(cb, null, cache);
-		return;
-	}
-
-	var env = process.env;
-	var locale = env.LC_ALL || env.LANGUAGE || env.LANG || env.LC_MESSAGES;
-
-	if (locale) {
-		cache = getLocale(locale);
+	if (cache || getEnvLocale()) {
 		setImmediate(cb, null, cache);
 		return;
 	}
@@ -53,53 +56,38 @@ module.exports = function (cb) {
 				return;
 			}
 
-			var res = /(?:LC_ALL|LANG|LC_MESSAGES|LC_CTYPE|)="([^"]{2,})"/.exec(stdout);
+			var res = parseLocale(stdout);
 
 			if (!res && process.platform === 'darwin') {
 				getAppleLocale();
 				return;
 			}
 
-			cache = getLocale(res && res[1]);
+			cache = getLocale(res);
 			cb(null, cache);
 		});
 	}
 };
 
 module.exports.sync = function () {
-	if (cache) {
+	if (cache || getEnvLocale()) {
 		return cache;
 	}
-
-	var env = process.env;
-	var locale = env.LC_ALL || env.LANGUAGE || env.LANG || env.LC_MESSAGES;
-
-	if (locale) {
-		cache = getLocale(locale);
-		return cache;
-	}
-
-	var stdout = process.platform === 'win32' ?
-		execFileSync('wmic', ['os', 'get', 'locale'], {encoding: 'utf8'}) :
-		execFileSync('locale', {encoding: 'utf8'});
-
-	var getAppleLocale = function () {
-		cache = execFileSync('defaults', ['read', '-g', 'AppleLocale']).strim() || 'en_US';
-		return cache;
-	};
 
 	if (process.platform === 'win32') {
+		var stdout = execFileSync('wmic', ['os', 'get', 'locale'], {encoding: 'utf8'});
 		var lcidCode = parseInt(stdout.replace('Locale', ''), 16);
 		cache = lcid.from(lcidCode) || 'en_US';
 		return cache;
 	}
 
-	var res = /(?:LC_ALL|LANG|LC_MESSAGES|LC_CTYPE|)="([^"]{2,})"/.exec(stdout);
+	var res = parseLocale(execFileSync('locale', {encoding: 'utf8'}));
 
 	if (!res && process.platform === 'darwin') {
-		return getAppleLocale();
+		cache = execFileSync('defaults', ['read', '-g', 'AppleLocale'], {encoding: 'utf8'}).trim() || 'en_US';
+		return cache;
 	}
 
-	cache = getLocale(res && res[1]);
+	cache = getLocale(res);
 	return cache;
 };
