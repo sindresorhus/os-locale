@@ -75,7 +75,15 @@ module.exports.sync = function () {
 	}
 
 	if (process.platform === 'win32') {
-		var stdout = execFileSync('wmic', ['os', 'get', 'locale'], {encoding: 'utf8'});
+		var stdout;
+
+		try {
+			stdout = execFileSync('wmic', ['os', 'get', 'locale'], {encoding: 'utf8'});
+		} catch (err) {
+			cache = 'en_US';
+			return cache;
+		}
+
 		var lcidCode = parseInt(stdout.replace('Locale', ''), 16);
 		cache = lcid.from(lcidCode) || 'en_US';
 		return cache;
