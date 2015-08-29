@@ -4,6 +4,11 @@ var execFileSync = require('exec-file-sync');
 var lcid = require('lcid');
 var cache;
 
+function fallback() {
+	cache = 'en_US';
+	return cache;
+}
+
 function getEnvLocale() {
 	var env = process.env;
 	var ret = env.LC_ALL || env.LANGUAGE || env.LANG || env.LC_MESSAGES;
@@ -17,7 +22,7 @@ function parseLocale(x) {
 }
 
 function getLocale(str) {
-	return (str && str.replace(/[.:].*/, '')) || 'en_US';
+	return (str && str.replace(/[.:].*/, '')) || fallback();
 }
 
 module.exports = function (cb) {
@@ -29,11 +34,11 @@ module.exports = function (cb) {
 	var getAppleLocale = function () {
 		childProcess.execFile('defaults', ['read', '-g', 'AppleLocale'], function (err, stdout) {
 			if (err) {
-				cb(err);
+				fallback();
 				return;
 			}
 
-			cache = stdout.trim() || 'en_US';
+			cache = stdout.trim() || fallback();
 			cb(null, cache);
 		});
 	};
@@ -41,18 +46,18 @@ module.exports = function (cb) {
 	if (process.platform === 'win32') {
 		childProcess.execFile('wmic', ['os', 'get', 'locale'], function (err, stdout) {
 			if (err) {
-				cb(err);
+				fallback();
 				return;
 			}
 
 			var lcidCode = parseInt(stdout.replace('Locale', ''), 16);
-			cache = lcid.from(lcidCode) || 'en_US';
+			cache = lcid.from(lcidCode) || fallback();
 			cb(null, cache);
 		});
 	} else {
 		childProcess.execFile('locale', function (err, stdout) {
 			if (err) {
-				cb(err);
+				fallback();
 				return;
 			}
 
@@ -80,20 +85,27 @@ module.exports.sync = function () {
 		try {
 			stdout = execFileSync('wmic', ['os', 'get', 'locale'], {encoding: 'utf8'});
 		} catch (err) {
-			cache = 'en_US';
-			return cache;
+			return fallback();
 		}
 
 		var lcidCode = parseInt(stdout.replace('Locale', ''), 16);
-		cache = lcid.from(lcidCode) || 'en_US';
+		cache = lcid.from(lcidCode) || fallback();
 		return cache;
 	}
 
-	var res = parseLocale(execFileSync('locale', {encoding: 'utf8'}));
+	var res;
+
+	try {
+		res = parseLocale(execFileSync('locale', {encoding: 'utf8'}));
+	} catch (err) {}
 
 	if (!res && process.platform === 'darwin') {
-		cache = execFileSync('defaults', ['read', '-g', 'AppleLocale'], {encoding: 'utf8'}).trim() || 'en_US';
-		return cache;
+		try {
+			cache = execFileSync('defaults', ['read', '-g', 'AppleLocale'], {encoding: 'utf8'}).trim() || fallback();
+			return cache;
+		} catch (err) {
+			return fallback();
+		}
 	}
 
 	cache = getLocale(res);
