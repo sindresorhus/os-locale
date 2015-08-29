@@ -3,7 +3,7 @@ var test = require('ava');
 var osLocale = require('./');
 
 test('async', function (t) {
-	t.plan(2);
+	t.plan(3);
 
 	osLocale(function (err, locale) {
 		console.log('Locale identifier:', locale);
