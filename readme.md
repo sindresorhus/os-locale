@@ -14,6 +14,11 @@ $ npm install --save os-locale
 
 ## Usage
 
+### Async
+
+Provide a callback that will be executed when the operating system's
+locale has been resolved.
+
 ```js
 var osLocale = require('os-locale');
 
@@ -23,6 +28,23 @@ osLocale(function (err, locale) {
 });
 ```
 
+### Sync
+
+Return the operating system's locale as soon as it is resolved.
+
+```js
+var osLocale = require('os-locale');
+
+var locale = osLocale.sync();
+console.log(locale);
+//=> 'en_US'
+```
+
+### Options
+
+For either method, optionally pass `{spawn: false}` as an additional
+argument to avoid spawning subprocesses and resolve the locale from
+environment variables alone.
 
 ## License
 
