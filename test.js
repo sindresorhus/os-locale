@@ -70,7 +70,7 @@ test.serial('async without spawn', function (t) {
 		console.log('Locale identifier:', locale);
 		afterTest();
 		t.error(err, err);
-		t.assert(locale === expectedFallback, 'Locale did not match expected fallback');
+		t.is(locale, expectedFallback, 'Locale did not match expected fallback');
 		t.assert(locale !== 'spawn_NOTALLOWED', 'Attempted to spawn subprocess');
 	}, {spawn: false});
 });
@@ -90,7 +90,7 @@ test.serial('sync without spawn', function (t) {
 	// test sync method
 	var locale = requireUncached('./').sync({spawn: false});
 	console.log('Locale identifier:', locale);
-	t.assert(locale === expectedFallback, 'Locale did not match expected fallback');
+	t.is(locale, expectedFallback, 'Locale did not match expected fallback');
 
 	// restore env vars and undo mock
 	restoreEnvVars(beforeTest);
