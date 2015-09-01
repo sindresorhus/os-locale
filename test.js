@@ -59,7 +59,7 @@ test.serial('async without spawn', function (t) {
 		}
 	};
 
-	// callback to restore env vars, undo mock, and reload os-locale for subsequent tests
+	// callback to restore env vars and undo mock
 	var afterTest = function () {
 		restoreEnvVars(beforeTest);
 		require('child_process').execFile = beforeTest.childProcessExecFile;
@@ -81,11 +81,13 @@ test.serial('sync without spawn', function (t) {
 	// unset env vars and cache for restoration
 	unsetEnvVars(beforeTest);
 
-	// mock exec-file-sync
-	beforeTest['exec-file-sync'] = require('exec-file-sync');
-	require.cache[require.resolve('exec-file-sync')].exports = function () {
-		t.false('Attempted to spawn subprocess');
-	};
+	// mock child_process.execFileSync
+	if (require('child_process').execFileSync) {
+		beforeTest.childProcessExecFileSync = require('child_process').execFileSync;
+		require('child_process').execFileSync = function () {
+			t.false('Attempted to spawn subprocess');
+		};
+	}
 
 	// test sync method
 	var locale = requireUncached('./').sync({spawn: false});
@@ -94,7 +96,9 @@ test.serial('sync without spawn', function (t) {
 
 	// restore env vars and undo mock
 	restoreEnvVars(beforeTest);
-	require.cache[require.resolve('exec-file-sync')].exports = beforeTest['exec-file-sync'];
+	if (beforeTest.childProcessExecFileSync) {
+		require('child_process').execFileSync = beforeTest.childProcessExecFileSync;
+	}
 
 	t.end();
 });
