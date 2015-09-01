@@ -13,7 +13,7 @@
     "node": ">=0.10.0"
   },
   "scripts": {
-    "test": "xo && node test.js"
+    "test": "xo && ava"
   },
   "files": [
     "index.js"
@@ -36,7 +36,8 @@
     "lcid": "^1.0.0"
   },
   "devDependencies": {
-    "ava": "0.0.4",
+    "ava": "*",
+    "require-uncached": "^1.0.2",
     "xo": "*"
   }
 }

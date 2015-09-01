@@ -2,6 +2,7 @@
 var childProcess = require('child_process');
 var execFileSync = childProcess.execFileSync;
 var lcid = require('lcid');
+var defaultOpts = {spawn: true};
 var cache;
 
 function fallback() {
@@ -25,8 +26,10 @@ function getLocale(str) {
 	return (str && str.replace(/[.:].*/, '')) || fallback();
 }
 
-module.exports = function (cb) {
-	if (cache || getEnvLocale()) {
+module.exports = function (cb, opts) {
+	opts = opts || defaultOpts;
+
+	if (cache || getEnvLocale() || opts.spawn === false) {
 		setImmediate(cb, null, cache);
 		return;
 	}
@@ -74,8 +77,10 @@ module.exports = function (cb) {
 	}
 };
 
-module.exports.sync = function () {
-	if (cache || getEnvLocale() || !execFileSync) {
+module.exports.sync = function (opts) {
+	opts = opts || defaultOpts;
+
+	if (cache || getEnvLocale() || !execFileSync || opts.spawn === false) {
 		return cache;
 	}
 
