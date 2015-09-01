@@ -11,14 +11,18 @@ function reloadOsLocale() {
 
 function unsetEnvVars(cache) {
 	envVars.forEach(function (envVar) {
-		cache[envVar] = process.env[envVar];
-		delete process.env[envVar];
+		if (process.env[envVar]) {
+			cache[envVar] = process.env[envVar];
+			delete process.env[envVar];
+		}
 	});
 }
 
 function restoreEnvVars(cache) {
 	envVars.forEach(function (envVar) {
-		process.env[envVar] = cache[envVar];
+		if (cache[envVar]) {
+			process.env[envVar] = cache[envVar];
+		}
 	});
 }
 
