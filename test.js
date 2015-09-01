@@ -1,13 +1,8 @@
 'use strict';
 var test = require('ava');
-var osLocale = require('./');
+var requireUncached = require('require-uncached');
 var envVars = ['LC_ALL', 'LANGUAGE', 'LANG', 'LC_MESSAGES'];
 var expectedFallback = 'en_US';
-
-function reloadOsLocale() {
-	delete require.cache[require.resolve('./')];
-	osLocale = require('./');
-}
 
 function unsetEnvVars(cache) {
 	envVars.forEach(function (envVar) {
@@ -29,7 +24,7 @@ function restoreEnvVars(cache) {
 test('async', function (t) {
 	t.plan(3);
 
-	osLocale(function (err, locale) {
+	requireUncached('./')(function (err, locale) {
 		console.log('Locale identifier:', locale);
 		t.assert(!err, err);
 		t.assert(locale.length > 1);
@@ -38,7 +33,7 @@ test('async', function (t) {
 });
 
 test('sync', function (t) {
-	var locale = osLocale.sync();
+	var locale = requireUncached('./').sync();
 	console.log('Locale identifier:', locale);
 	t.assert(locale.length > 1);
 	t.assert(locale.indexOf('_') !== -1);
@@ -64,18 +59,14 @@ test.serial('async without spawn', function (t) {
 		}
 	};
 
-	// reload os-locale so mock takes effect
-	reloadOsLocale();
-
 	// callback to restore env vars, undo mock, and reload os-locale for subsequent tests
 	var afterTest = function () {
 		restoreEnvVars(beforeTest);
 		require('child_process').execFile = beforeTest.childProcessExecFile;
-		reloadOsLocale();
 	};
 
 	// test async method
-	osLocale(function (err, locale) {
+	requireUncached('./')(function (err, locale) {
 		console.log('Locale identifier:', locale);
 		afterTest();
 		t.assert(!err, err);
@@ -96,20 +87,14 @@ test.serial('sync without spawn', function (t) {
 		t.assert(false, 'Attempted to spawn subprocess');
 	};
 
-	// reload os-locale so mock takes effect
-	reloadOsLocale();
-
 	// test sync method
-	var locale = osLocale.sync({spawn: false});
+	var locale = requireUncached('./').sync({spawn: false});
 	console.log('Locale identifier:', locale);
 	t.assert(locale === expectedFallback, 'Locale did not match expected fallback');
 
 	// restore env vars and undo mock
 	restoreEnvVars(beforeTest);
 	require.cache[require.resolve('exec-file-sync')].exports = beforeTest['exec-file-sync'];
-
-	// reload os-locale for subsequent tests
-	reloadOsLocale();
 
 	t.end();
 });
