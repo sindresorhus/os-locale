@@ -37,7 +37,8 @@
     "lcid": "^1.0.0"
   },
   "devDependencies": {
-    "ava": "0.0.4",
+    "ava": "*",
+    "require-uncached": "*",
     "xo": "*"
   }
 }
