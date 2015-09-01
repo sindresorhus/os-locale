@@ -37,7 +37,7 @@
     "lcid": "^1.0.0"
   },
   "devDependencies": {
-    "ava": "0.1.0",
+    "ava": "*",
     "xo": "*"
   }
 }
