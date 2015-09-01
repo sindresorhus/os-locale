@@ -28,7 +28,7 @@ test('async', function (t) {
 		console.log('Locale identifier:', locale);
 		t.error(err, err);
 		t.assert(locale.length > 1);
-		t.assert(locale.indexOf('_') !== -1);
+		t.not(locale.indexOf('_'), -1);
 	});
 });
 
@@ -36,7 +36,7 @@ test('sync', function (t) {
 	var locale = requireUncached('./').sync();
 	console.log('Locale identifier:', locale);
 	t.assert(locale.length > 1);
-	t.assert(locale.indexOf('_') !== -1);
+	t.not(locale.indexOf('_'), -1);
 	t.end();
 });
 
@@ -71,7 +71,7 @@ test.serial('async without spawn', function (t) {
 		afterTest();
 		t.error(err, err);
 		t.is(locale, expectedFallback, 'Locale did not match expected fallback');
-		t.assert(locale !== 'spawn_NOTALLOWED', 'Attempted to spawn subprocess');
+		t.not(locale, 'spawn_NOTALLOWED', 'Attempted to spawn subprocess');
 	}, {spawn: false});
 });
 
