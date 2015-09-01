@@ -1,6 +1,6 @@
 'use strict';
 var childProcess = require('child_process');
-var execFileSync = require('exec-file-sync');
+var execFileSync = childProcess.execFileSync;
 var lcid = require('lcid');
 var cache;
 
@@ -75,7 +75,7 @@ module.exports = function (cb) {
 };
 
 module.exports.sync = function () {
-	if (cache || getEnvLocale()) {
+	if (cache || getEnvLocale() || !execFileSync) {
 		return cache;
 	}
 
