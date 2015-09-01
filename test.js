@@ -26,7 +26,7 @@ test('async', function (t) {
 
 	requireUncached('./')(function (err, locale) {
 		console.log('Locale identifier:', locale);
-		t.assert(!err, err);
+		t.error(err, err);
 		t.assert(locale.length > 1);
 		t.assert(locale.indexOf('_') !== -1);
 	});
@@ -69,7 +69,7 @@ test.serial('async without spawn', function (t) {
 	requireUncached('./')(function (err, locale) {
 		console.log('Locale identifier:', locale);
 		afterTest();
-		t.assert(!err, err);
+		t.error(err, err);
 		t.assert(locale === expectedFallback, 'Locale did not match expected fallback');
 		t.assert(locale !== 'spawn_NOTALLOWED', 'Attempted to spawn subprocess');
 	}, {spawn: false});
