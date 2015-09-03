@@ -66,13 +66,13 @@ test.serial('async without spawn', function (t) {
 	};
 
 	// test async method
-	requireUncached('./')(function (err, locale) {
+	requireUncached('./')({spawn: false}, function (err, locale) {
 		console.log('Locale identifier:', locale);
 		afterTest();
 		t.error(err);
 		t.is(locale, expectedFallback, 'Locale did not match expected fallback');
 		t.not(locale, 'spawn_NOTALLOWED', 'Attempted to spawn subprocess');
-	}, {spawn: false});
+	});
 });
 
 test.serial('sync without spawn', function (t) {
