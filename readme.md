@@ -14,8 +14,6 @@ $ npm install --save os-locale
 
 ## Usage
 
-### Async
-
 ```js
 var osLocale = require('os-locale');
 
@@ -25,19 +23,21 @@ osLocale(function (err, locale) {
 });
 ```
 
-### Sync
 
-```js
-var osLocale = require('os-locale');
+## API
 
-var locale = osLocale.sync();
-console.log(locale);
-//=> 'en_US'
-```
+### osLocale([options], callback(error, locale))
 
-### Options
+### osLocale.sync([options])
 
-For either method, optionally pass `{spawn: false}` as an additional argument to avoid spawning subprocesses and instead resolve the locale from environment variables alone.
+Returns the locale.
+
+#### options.spawn
+
+Type: `boolean`  
+Default: `true`
+
+Set to `false` to avoid spawning subprocesses and instead only resolve the locale from environment variables.
 
 
 ## License
