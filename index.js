@@ -26,8 +26,13 @@ function getLocale(str) {
 	return (str && str.replace(/[.:].*/, '')) || fallback();
 }
 
-module.exports = function (cb, opts) {
-	opts = opts || defaultOpts;
+module.exports = function (opts, cb) {
+	if (typeof opts === 'function') {
+		cb = opts;
+		opts = defaultOpts;
+	} else {
+		opts = opts || defaultOpts;
+	}
 
 	if (cache || getEnvLocale() || opts.spawn === false) {
 		setImmediate(cb, null, cache);
