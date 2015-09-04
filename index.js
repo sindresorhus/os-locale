@@ -10,8 +10,8 @@ function fallback() {
 	return cache;
 }
 
-function getEnvLocale() {
-	var env = process.env;
+function getEnvLocale(env) {
+	env = env || process.env;
 	var ret = env.LC_ALL || env.LC_MESSAGES || env.LANG || env.LANGUAGE;
 	cache = getLocale(ret);
 	return ret;
