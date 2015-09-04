@@ -19,11 +19,11 @@ function getEnvLocale(env) {
 
 function parseLocale(x) {
 	var env = x.split('\n').reduce(function (env, def) {
-		def = def.split('=')
-		env[def[0]] = def[1]
-		return env
-	}, {})
-	return getEnvLocale(env)
+		def = def.split('=');
+		env[def[0]] = def[1];
+		return env;
+	}, {});
+	return getEnvLocale(env);
 }
 
 function getLocale(str) {
