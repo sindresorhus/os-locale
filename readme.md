@@ -1,8 +1,12 @@
 # os-locale [![Build Status](https://travis-ci.org/sindresorhus/os-locale.svg?branch=master)](https://travis-ci.org/sindresorhus/os-locale)
 
-> Get the system [locale](http://en.wikipedia.org/wiki/Locale)
+Get the system [locale](http://en.wikipedia.org/wiki/Locale).
 
 Useful for localizing your module or app.
+
+POSIX systems: The returned locale refers to the `LC_MESSAGE`
+category, suitable for selecting the language used in the user
+interface for message translation.
 
 
 ## Install
