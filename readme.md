@@ -4,6 +4,8 @@
 
 Useful for localizing your module or app.
 
+POSIX systems: The returned locale refers to the [`LC_MESSAGE`](http://www.gnu.org/software/libc/manual/html_node/Locale-Categories.html#Locale-Categories) category, suitable for selecting the language used in the user interface for message translation.
+
 
 ## Install
 

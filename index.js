@@ -10,16 +10,20 @@ function fallback() {
 	return cache;
 }
 
-function getEnvLocale() {
-	var env = process.env;
-	var ret = env.LC_ALL || env.LANGUAGE || env.LANG || env.LC_MESSAGES;
+function getEnvLocale(env) {
+	env = env || process.env;
+	var ret = env.LC_ALL || env.LC_MESSAGES || env.LANG || env.LANGUAGE;
 	cache = getLocale(ret);
 	return ret;
 }
 
 function parseLocale(x) {
-	var res = /(?:LC_ALL|LANG|LC_MESSAGES|LC_CTYPE|)="([^"]{2,})"/.exec(x);
-	return res && res[1];
+	var env = x.split('\n').reduce(function (env, def) {
+		def = def.split('=');
+		env[def[0]] = def[1];
+		return env;
+	}, {});
+	return getEnvLocale(env);
 }
 
 function getLocale(str) {
