@@ -1,6 +1,7 @@
 'use strict';
 var test = require('ava');
 var requireUncached = require('require-uncached');
+var childProcess = require('child_process');
 var envVars = ['LC_ALL', 'LANGUAGE', 'LANG', 'LC_MESSAGES'];
 var expectedFallback = 'en_US';
 
@@ -49,8 +50,8 @@ test.serial('async without spawn', function (t) {
 	unsetEnvVars(beforeTest);
 
 	// mock child_process.execFile
-	beforeTest.childProcessExecFile = require('child_process').execFile;
-	require('child_process').execFile = function () {
+	beforeTest.childProcessExecFile = childProcess.execFile;
+	childProcess.execFile = function () {
 		var args = Array.prototype.slice.call(arguments);
 		var execFileCb = args[args.length - 1];
 		if (typeof execFileCb === 'function') {
@@ -62,7 +63,7 @@ test.serial('async without spawn', function (t) {
 	// callback to restore env vars and undo mock
 	var afterTest = function () {
 		restoreEnvVars(beforeTest);
-		require('child_process').execFile = beforeTest.childProcessExecFile;
+		childProcess.execFile = beforeTest.childProcessExecFile;
 	};
 
 	// test async method
@@ -82,9 +83,9 @@ test.serial('sync without spawn', function (t) {
 	unsetEnvVars(beforeTest);
 
 	// mock child_process.execFileSync
-	if (require('child_process').execFileSync) {
-		beforeTest.childProcessExecFileSync = require('child_process').execFileSync;
-		require('child_process').execFileSync = function () {
+	if (childProcess.execFileSync) {
+		beforeTest.childProcessExecFileSync = childProcess.execFileSync;
+		childProcess.execFileSync = function () {
 			t.false('Attempted to spawn subprocess');
 		};
 	}
@@ -97,7 +98,7 @@ test.serial('sync without spawn', function (t) {
 	// restore env vars and undo mock
 	restoreEnvVars(beforeTest);
 	if (beforeTest.childProcessExecFileSync) {
-		require('child_process').execFileSync = beforeTest.childProcessExecFileSync;
+		childProcess.execFileSync = beforeTest.childProcessExecFileSync;
 	}
 
 	t.end();
