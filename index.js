@@ -66,6 +66,8 @@ module.exports = function (opts, cb) {
 			cache = lcid.from(lcidCode) || fallback();
 			cb(null, cache);
 		});
+	} else if (process.platform === 'darwin') {
+		getAppleLocale();
 	} else {
 		childProcess.execFile('locale', function (err, stdout) {
 			if (err) {
@@ -74,11 +76,6 @@ module.exports = function (opts, cb) {
 			}
 
 			var res = parseLocale(stdout);
-
-			if (!res && process.platform === 'darwin') {
-				getAppleLocale();
-				return;
-			}
 
 			cache = getLocale(res);
 			cb(null, cache);
@@ -104,24 +101,17 @@ module.exports.sync = function (opts) {
 
 		var lcidCode = parseInt(stdout.replace('Locale', ''), 16);
 		cache = lcid.from(lcidCode) || fallback();
-		return cache;
-	}
+	} else if (process.platform === 'darwin') {
+		getAppleLocale();
+	} else {
+		var res;
 
-	var res;
-
-	try {
-		res = parseLocale(execFileSync('locale', {encoding: 'utf8'}));
-	} catch (err) {}
-
-	if (!res && process.platform === 'darwin') {
 		try {
-			cache = execFileSync('defaults', ['read', '-g', 'AppleLocale'], {encoding: 'utf8'}).trim() || fallback();
-			return cache;
-		} catch (err) {
-			return fallback();
-		}
+			res = parseLocale(execFileSync('locale', {encoding: 'utf8'}));
+		} catch (err) {}
+
+		cache = getLocale(res);
 	}
 
-	cache = getLocale(res);
 	return cache;
 };
