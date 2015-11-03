@@ -23,23 +23,10 @@ function parseLocale(x) {
 		env[def[0]] = def[1];
 		return env;
 	}, {});
-	return getEnvLocale(env);
 }
 
 function getLocale(str) {
-	return (str && str.replace(/[.:].*/, '')) || fallback();
-}
-
-function getAppleLocale() {
-	childProcess.execFile('defaults', ['read', '-g', 'AppleLocale'], function (err, stdout) {
-		if (err) {
-			fallback();
-			return;
-		}
-
-		cache = stdout.trim() || fallback();
-		cb(null, cache);
-	});
+	return (str && str.replace(/[.:].*/, ''));
 }
 
 module.exports = function (opts, cb) {
@@ -57,30 +44,23 @@ module.exports = function (opts, cb) {
 
 	if (process.platform === 'win32') {
 		childProcess.execFile('wmic', ['os', 'get', 'locale'], function (err, stdout) {
-			if (err) {
-				fallback();
-				return;
-			}
-
+			if (err) return;
 			var lcidCode = parseInt(stdout.replace('Locale', ''), 16);
-			cache = lcid.from(lcidCode) || fallback();
-			cb(null, cache);
+			cache = lcid.from(lcidCode);
 		});
 	} else if (process.platform === 'darwin') {
-		getAppleLocale();
+		childProcess.execFile('defaults', ['read', '-g', 'AppleLocale'], function (err, stdout) {
+			if (err) return;
+			cache = stdout.trim();
+		});
 	} else {
 		childProcess.execFile('locale', function (err, stdout) {
-			if (err) {
-				fallback();
-				return;
-			}
-
+			if (err) return;
 			var res = parseLocale(stdout);
-
 			cache = getLocale(res);
-			cb(null, cache);
 		});
 	}
+	cb(null, cache || fallback());
 };
 
 module.exports.sync = function (opts) {
@@ -90,28 +70,18 @@ module.exports.sync = function (opts) {
 		return cache;
 	}
 
-	if (process.platform === 'win32') {
-		var stdout;
-
-		try {
-			stdout = execFileSync('wmic', ['os', 'get', 'locale'], {encoding: 'utf8'});
-		} catch (err) {
-			return fallback();
+	try {
+		if (process.platform === 'win32') {
+			var stdout = execFileSync('wmic', ['os', 'get', 'locale'], {encoding: 'utf8'});
+			var lcidCode = parseInt(stdout.replace('Locale', ''), 16);
+			cache = lcid.from(lcidCode);
+		} else if (process.platform === 'darwin') {
+			cache = execFileSync('defaults', ['read', '-g', 'AppleLocale'], {encoding: 'utf8'}).trim();
+		} else {
+			var res = parseLocale(execFileSync('locale', {encoding: 'utf8'}));
+			cache = getLocale(res);
 		}
+	} catch (err) { }
 
-		var lcidCode = parseInt(stdout.replace('Locale', ''), 16);
-		cache = lcid.from(lcidCode) || fallback();
-	} else if (process.platform === 'darwin') {
-		getAppleLocale();
-	} else {
-		var res;
-
-		try {
-			res = parseLocale(execFileSync('locale', {encoding: 'utf8'}));
-		} catch (err) {}
-
-		cache = getLocale(res);
-	}
-
-	return cache;
+	return cache || fallback();
 };
