@@ -30,6 +30,18 @@ function getLocale(str) {
 	return (str && str.replace(/[.:].*/, '')) || fallback();
 }
 
+function getAppleLocale() {
+	childProcess.execFile('defaults', ['read', '-g', 'AppleLocale'], function (err, stdout) {
+		if (err) {
+			fallback();
+			return;
+		}
+
+		cache = stdout.trim() || fallback();
+		cb(null, cache);
+	});
+}
+
 module.exports = function (opts, cb) {
 	if (typeof opts === 'function') {
 		cb = opts;
@@ -42,18 +54,6 @@ module.exports = function (opts, cb) {
 		setImmediate(cb, null, cache);
 		return;
 	}
-
-	var getAppleLocale = function () {
-		childProcess.execFile('defaults', ['read', '-g', 'AppleLocale'], function (err, stdout) {
-			if (err) {
-				fallback();
-				return;
-			}
-
-			cache = stdout.trim() || fallback();
-			cb(null, cache);
-		});
-	};
 
 	if (process.platform === 'win32') {
 		childProcess.execFile('wmic', ['os', 'get', 'locale'], function (err, stdout) {
