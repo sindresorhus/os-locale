@@ -1,6 +1,7 @@
 'use strict';
 var childProcess = require('child_process');
 var execFileSync = childProcess.execFileSync;
+var spawnSync = childProcess.spawnSync;
 var lcid = require('lcid');
 var defaultOpts = {spawn: true};
 var cache;
@@ -72,8 +73,8 @@ module.exports.sync = function (opts) {
 
 	try {
 		if (process.platform === 'win32') {
-			var stdout = execFileSync('wmic', ['os', 'get', 'locale'], {encoding: 'utf8'});
-			var lcidCode = parseInt(stdout.replace('Locale', ''), 16);
+			var ret = spawnSync('wmic', ['os', 'get', 'locale'], {encoding: 'utf8'});
+			var lcidCode = parseInt(ret.stdout.replace('Locale', ''), 16);
 			cache = lcid.from(lcidCode);
 		} else if (process.platform === 'darwin') {
 			cache = execFileSync('defaults', ['read', '-g', 'AppleLocale'], {encoding: 'utf8'}).trim();
