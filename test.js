@@ -1,12 +1,12 @@
-'use strict';
-var test = require('ava');
-var requireUncached = require('require-uncached');
-var childProcess = require('child_process');
-var envVars = ['LC_ALL', 'LANGUAGE', 'LANG', 'LC_MESSAGES'];
-var expectedFallback = 'en_US';
+import childProcess from 'child_process';
+import test from 'ava';
+import requireUncached from 'require-uncached';
+
+const envVars = ['LC_ALL', 'LANGUAGE', 'LANG', 'LC_MESSAGES'];
+const expectedFallback = 'en_US';
 
 function unsetEnvVars(cache) {
-	envVars.forEach(function (envVar) {
+	envVars.forEach(envVar => {
 		if (process.env[envVar]) {
 			cache[envVar] = process.env[envVar];
 			delete process.env[envVar];
@@ -15,45 +15,46 @@ function unsetEnvVars(cache) {
 }
 
 function restoreEnvVars(cache) {
-	envVars.forEach(function (envVar) {
+	envVars.forEach(envVar => {
 		if (cache[envVar]) {
 			process.env[envVar] = cache[envVar];
 		}
 	});
 }
 
-test('async', function (t) {
+test.cb('async', t => {
 	t.plan(3);
 
-	requireUncached('./')(function (err, locale) {
+	requireUncached('./')((err, locale) => {
 		console.log('Locale identifier:', locale);
-		t.error(err);
+		t.ifError(err);
 		t.true(locale.length > 1);
 		t.not(locale.indexOf('_'), -1);
+		t.end();
 	});
 });
 
-test('sync', function (t) {
-	var locale = requireUncached('./').sync();
+test('sync', t => {
+	const locale = requireUncached('./').sync();
 	console.log('Locale identifier:', locale);
 	t.true(locale.length > 1);
 	t.not(locale.indexOf('_'), -1);
-	t.end();
 });
 
-test.serial('async without spawn', function (t) {
+test.cb.serial('async without spawn', t => {
 	t.plan(3);
 
-	var beforeTest = {};
+	const beforeTest = {};
 
 	// unset env vars and cache for restoration
 	unsetEnvVars(beforeTest);
 
 	// mock child_process.execFile
 	beforeTest.childProcessExecFile = childProcess.execFile;
-	childProcess.execFile = function () {
-		var args = Array.prototype.slice.call(arguments);
-		var execFileCb = args[args.length - 1];
+	childProcess.execFile = () => {
+		const args = Array.prototype.slice.call(arguments);
+		const execFileCb = args[args.length - 1];
+
 		if (typeof execFileCb === 'function') {
 			// passing Error here causes osLocale callback not to be called
 			execFileCb(null, 'spawn_NOTALLOWED');
@@ -61,23 +62,24 @@ test.serial('async without spawn', function (t) {
 	};
 
 	// callback to restore env vars and undo mock
-	var afterTest = function () {
+	const afterTest = () => {
 		restoreEnvVars(beforeTest);
 		childProcess.execFile = beforeTest.childProcessExecFile;
 	};
 
 	// test async method
-	requireUncached('./')({spawn: false}, function (err, locale) {
+	requireUncached('./')({spawn: false}, (err, locale) => {
 		console.log('Locale identifier:', locale);
 		afterTest();
-		t.error(err);
+		t.ifError(err);
 		t.is(locale, expectedFallback, 'Locale did not match expected fallback');
 		t.not(locale, 'spawn_NOTALLOWED', 'Attempted to spawn subprocess');
+		t.end();
 	});
 });
 
-test.serial('sync without spawn', function (t) {
-	var beforeTest = {};
+test.serial('sync without spawn', t => {
+	const beforeTest = {};
 
 	// unset env vars and cache for restoration
 	unsetEnvVars(beforeTest);
@@ -85,13 +87,13 @@ test.serial('sync without spawn', function (t) {
 	// mock child_process.execFileSync
 	if (childProcess.execFileSync) {
 		beforeTest.childProcessExecFileSync = childProcess.execFileSync;
-		childProcess.execFileSync = function () {
+		childProcess.execFileSync = () => {
 			t.false('Attempted to spawn subprocess');
 		};
 	}
 
 	// test sync method
-	var locale = requireUncached('./').sync({spawn: false});
+	const locale = requireUncached('./').sync({spawn: false});
 	console.log('Locale identifier:', locale);
 	t.is(locale, expectedFallback, 'Locale did not match expected fallback');
 
@@ -100,6 +102,4 @@ test.serial('sync without spawn', function (t) {
 	if (beforeTest.childProcessExecFileSync) {
 		childProcess.execFileSync = beforeTest.childProcessExecFileSync;
 	}
-
-	t.end();
 });
