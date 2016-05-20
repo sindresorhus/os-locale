@@ -56,7 +56,7 @@ module.exports = function (opts, cb) {
 	};
 
 	if (process.platform === 'win32') {
-		childProcess.execFile('wmic', ['os', 'get', 'locale'], function (err, stdout) {
+		childProcess.execFile('cmd', ['/c', 'echo', '\'\'', '|', 'wmic', 'os', 'get', 'locale'], function (err, stdout) {
 			if (err) {
 				fallback();
 				return;
@@ -97,7 +97,7 @@ module.exports.sync = function (opts) {
 		var stdout;
 
 		try {
-			stdout = execFileSync('wmic', ['os', 'get', 'locale'], {encoding: 'utf8'});
+			stdout = execFileSync('cmd', ['/c', 'echo', '\'\'', '|', 'wmic', 'os', 'get', 'locale'], {encoding: 'utf8'});
 		} catch (err) {
 			return fallback();
 		}
