@@ -1,7 +1,8 @@
 'use strict';
 var childProcess = require('child_process');
-var execFileSync = childProcess.execFileSync;
 var lcid = require('lcid');
+
+var execFileSync = childProcess.execFileSync;
 var defaultOpts = {spawn: true};
 var cache;
 
