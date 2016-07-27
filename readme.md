@@ -1,6 +1,6 @@
 # os-locale [![Build Status](https://travis-ci.org/sindresorhus/os-locale.svg?branch=master)](https://travis-ci.org/sindresorhus/os-locale)
 
-> Get the system [locale](http://en.wikipedia.org/wiki/Locale)
+> Get the system [locale](https://en.wikipedia.org/wiki/Locale_(computer_software))
 
 Useful for localizing your module or app.
 
