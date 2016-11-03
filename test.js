@@ -1,4 +1,4 @@
-import childProcess from 'child_process';
+import execa from 'execa';
 import test from 'ava';
 import requireUncached from 'require-uncached';
 
@@ -23,15 +23,19 @@ function restoreEnvVars(cache) {
 }
 
 test.cb('async', t => {
-	t.plan(3);
+	t.plan(2);
 
-	requireUncached('./')((err, locale) => {
-		console.log('Locale identifier:', locale);
-		t.ifError(err);
-		t.true(locale.length > 1);
-		t.not(locale.indexOf('_'), -1);
-		t.end();
-	});
+	requireUncached('./')()
+		.then(locale => {
+			console.log('Locale identifier:', locale);
+			t.true(locale.length > 1);
+			t.not(locale.indexOf('_'), -1);
+			t.end();
+		})
+		.catch(() => {
+			t.false('Promise rejected');
+			t.end();
+		});
 });
 
 test('sync', t => {
@@ -42,40 +46,36 @@ test('sync', t => {
 });
 
 test.cb.serial('async without spawn', t => {
-	t.plan(3);
+	t.plan(2);
 
 	const beforeTest = {};
 
 	// unset env vars and cache for restoration
 	unsetEnvVars(beforeTest);
 
-	// mock child_process.execFile
-	beforeTest.childProcessExecFile = childProcess.execFile;
-	childProcess.execFile = () => {
-		const args = Array.prototype.slice.call(arguments);
-		const execFileCb = args[args.length - 1];
-
-		if (typeof execFileCb === 'function') {
-			// passing Error here causes osLocale callback not to be called
-			execFileCb(null, 'spawn_NOTALLOWED');
-		}
-	};
+	// mock execa.stdout
+	beforeTest.stdout = execa.stdout;
+	execa.stdout = () => new Promise(resolve => resolve('spawn_NOTALLOWED'));
 
 	// callback to restore env vars and undo mock
 	const afterTest = () => {
 		restoreEnvVars(beforeTest);
-		childProcess.execFile = beforeTest.childProcessExecFile;
+		execa.stdout = beforeTest.execaStdout;
 	};
 
 	// test async method
-	requireUncached('./')({spawn: false}, (err, locale) => {
-		console.log('Locale identifier:', locale);
-		afterTest();
-		t.ifError(err);
-		t.is(locale, expectedFallback, 'Locale did not match expected fallback');
-		t.not(locale, 'spawn_NOTALLOWED', 'Attempted to spawn subprocess');
-		t.end();
-	});
+	requireUncached('./')({spawn: false})
+		.then(locale => {
+			console.log('Locale identifier:', locale);
+			afterTest();
+			t.is(locale, expectedFallback, 'Locale did not match expected fallback');
+			t.not(locale, 'spawn_NOTALLOWED', 'Attempted to spawn subprocess');
+			t.end();
+		})
+		.catch(() => {
+			t.false('Promise rejected');
+			t.end();
+		});
 });
 
 test.serial('sync without spawn', t => {
@@ -84,10 +84,10 @@ test.serial('sync without spawn', t => {
 	// unset env vars and cache for restoration
 	unsetEnvVars(beforeTest);
 
-	// mock child_process.execFileSync
-	if (childProcess.execFileSync) {
-		beforeTest.childProcessExecFileSync = childProcess.execFileSync;
-		childProcess.execFileSync = () => {
+	// mock execa.sync
+	if (execa.sync) {
+		beforeTest.execaSync = execa.sync;
+		execa.sync = () => {
 			t.false('Attempted to spawn subprocess');
 		};
 	}
@@ -99,7 +99,7 @@ test.serial('sync without spawn', t => {
 
 	// restore env vars and undo mock
 	restoreEnvVars(beforeTest);
-	if (beforeTest.childProcessExecFileSync) {
-		childProcess.execFileSync = beforeTest.childProcessExecFileSync;
+	if (beforeTest.execaSync) {
+		execa.sync = beforeTest.execaSync;
 	}
 });
