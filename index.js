@@ -14,6 +14,7 @@ function fallback() {
 function getEnvLocale(env) {
 	env = env || process.env;
 	var ret = env.LC_ALL || env.LC_MESSAGES || env.LANG || env.LANGUAGE;
+	if(process.platform == "darwin" && env.LANG == "") return false;
 	cache = getLocale(ret);
 	return ret;
 }
