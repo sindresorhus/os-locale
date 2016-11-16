@@ -41,5 +41,8 @@
     "ava": "*",
     "require-uncached": "^1.0.2",
     "xo": "*"
+  },
+  "xo": {
+    "esnext": true
   }
 }

@@ -17,7 +17,7 @@ $ npm install --save os-locale
 ## Usage
 
 ```js
-var osLocale = require('os-locale');
+const osLocale = require('os-locale');
 
 osLocale.then(locale => {
 	console.log(locale);
@@ -30,15 +30,19 @@ osLocale.then(locale => {
 
 ### osLocale([options])
 
-Returns a promise for the locale.
+Returns a `Promise` for the locale.
 
 ### osLocale.sync([options])
 
 Returns the locale.
 
-#### options.spawn
+#### options
 
-Type: `boolean`  
+Type: `Object`
+
+##### spawn
+
+Type: `boolean`<br>
 Default: `true`
 
 Set to `false` to avoid spawning subprocesses and instead only resolve the locale from environment variables.
@@ -46,4 +50,4 @@ Set to `false` to avoid spawning subprocesses and instead only resolve the local
 
 ## License
 
-MIT © [Sindre Sorhus](http://sindresorhus.com)
+MIT © [Sindre Sorhus](https://sindresorhus.com)

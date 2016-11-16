@@ -14,7 +14,7 @@ function getEnvLocale(env) {
 function parseLocale(x) {
 	const env = x.split('\n').reduce((env, def) => {
 		def = def.split('=');
-		env[def[0]] = def[1].replace('"', '');
+		env[def[0]] = def[1].replace(/^"|"$/g, '');
 		return env;
 	}, {});
 	return getEnvLocale(env);
@@ -58,7 +58,7 @@ function getWinLocale() {
 }
 
 function getWinLocaleSync() {
-	let stdout = execa.sync('wmic', ['os', 'get', 'locale']).stdout;
+	const stdout = execa.sync('wmic', ['os', 'get', 'locale']).stdout;
 	const lcidCode = parseInt(stdout.replace('Locale', ''), 16);
 	return lcid.from(lcidCode);
 }

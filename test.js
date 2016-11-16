@@ -26,14 +26,14 @@ test('async', async t => {
 	const locale = await requireUncached('./')();
 	console.log('Locale identifier:', locale);
 	t.true(locale.length > 1);
-	t.not(locale.indexOf('_'), -1);
+	t.true(locale.includes('_'));
 });
 
 test('sync', t => {
 	const locale = requireUncached('./').sync();
 	console.log('Locale identifier:', locale);
 	t.true(locale.length > 1);
-	t.not(locale.indexOf('_'), -1);
+	t.true(locale.includes('_'));
 });
 
 test('async without spawn', async t => {
