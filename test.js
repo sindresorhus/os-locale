@@ -1,6 +1,6 @@
 import execa from 'execa';
 import test from 'ava';
-import requireUncached from 'require-uncached';
+import importFresh from 'import-fresh';
 
 const envVars = ['LC_ALL', 'LANGUAGE', 'LANG', 'LC_MESSAGES'];
 const expectedFallback = 'en_US';
@@ -23,14 +23,14 @@ function restoreEnvVars(cache) {
 }
 
 test('async', async t => {
-	const locale = await requireUncached('./')();
+	const locale = await importFresh('.')();
 	console.log('Locale identifier:', locale);
 	t.true(locale.length > 1);
 	t.true(locale.includes('_'));
 });
 
 test('sync', t => {
-	const locale = requireUncached('./').sync();
+	const locale = importFresh('.').sync();
 	console.log('Locale identifier:', locale);
 	t.true(locale.length > 1);
 	t.true(locale.includes('_'));
@@ -39,21 +39,21 @@ test('sync', t => {
 test('async without spawn', async t => {
 	const beforeTest = {};
 
-	// unset env vars and cache for restoration
+	// Unset env vars and cache for restoration
 	unsetEnvVars(beforeTest);
 
-	// mock execa.stdout
+	// Mock execa.stdout
 	beforeTest.stdout = execa.stdout;
 	execa.stdout = () => new Promise(resolve => resolve('spawn_NOTALLOWED'));
 
-	// callback to restore env vars and undo mock
+	// Callback to restore env vars and undo mock
 	const afterTest = () => {
 		restoreEnvVars(beforeTest);
 		execa.stdout = beforeTest.execaStdout;
 	};
 
-	// test async method
-	const locale = await requireUncached('./')({spawn: false});
+	// Test async method
+	const locale = await importFresh('.')({spawn: false});
 	console.log('Locale identifier:', locale);
 	afterTest();
 	t.is(locale, expectedFallback, 'Locale did not match expected fallback');
@@ -63,21 +63,21 @@ test('async without spawn', async t => {
 test('sync without spawn', t => {
 	const beforeTest = {};
 
-	// unset env vars and cache for restoration
+	// Unset env vars and cache for restoration
 	unsetEnvVars(beforeTest);
 
-	// mock execa.sync
+	// Mock execa.sync
 	beforeTest.execaSync = execa.sync;
 	execa.sync = () => {
 		t.false('Attempted to spawn subprocess');
 	};
 
-	// test sync method
-	const locale = requireUncached('./').sync({spawn: false});
+	// Test sync method
+	const locale = importFresh('.').sync({spawn: false});
 	console.log('Locale identifier:', locale);
 	t.is(locale, expectedFallback, 'Locale did not match expected fallback');
 
-	// restore env vars and undo mock
+	// Restore env vars and undo mock
 	restoreEnvVars(beforeTest);
 	if (beforeTest.execaSync) {
 		execa.sync = beforeTest.execaSync;

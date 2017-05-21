@@ -33,16 +33,13 @@
     "region"
   ],
   "dependencies": {
-    "execa": "^0.5.0",
+    "execa": "^0.6.3",
     "lcid": "^1.0.0",
     "mem": "^1.1.0"
   },
   "devDependencies": {
     "ava": "*",
-    "require-uncached": "^1.0.2",
+    "import-fresh": "^2.0.0",
     "xo": "*"
-  },
-  "xo": {
-    "esnext": true
   }
 }
