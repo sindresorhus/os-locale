@@ -6,20 +6,20 @@ const envVars = ['LC_ALL', 'LANGUAGE', 'LANG', 'LC_MESSAGES'];
 const expectedFallback = 'en_US';
 
 function unsetEnvVars(cache) {
-	envVars.forEach(envVar => {
+	for (const envVar of envVars) {
 		if (process.env[envVar]) {
 			cache[envVar] = process.env[envVar];
 			delete process.env[envVar];
 		}
-	});
+	}
 }
 
 function restoreEnvVars(cache) {
-	envVars.forEach(envVar => {
+	for (const envVar of envVars) {
 		if (cache[envVar]) {
 			process.env[envVar] = cache[envVar];
 		}
-	});
+	}
 }
 
 test('async', async t => {

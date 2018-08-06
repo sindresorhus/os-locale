@@ -10,7 +10,7 @@ POSIX systems: The returned locale refers to the [`LC_MESSAGE`](http://www.gnu.o
 ## Install
 
 ```
-$ npm install --save os-locale
+$ npm install os-locale
 ```
 
 
@@ -19,10 +19,10 @@ $ npm install --save os-locale
 ```js
 const osLocale = require('os-locale');
 
-osLocale().then(locale => {
-	console.log(locale);
+(async () => {
+	console.log(await osLocale());
 	//=> 'en_US'
-});
+})();
 ```
 
 

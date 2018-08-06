@@ -3,7 +3,7 @@ const execa = require('execa');
 const lcid = require('lcid');
 const mem = require('mem');
 
-const defaultOpts = {spawn: true};
+const defaultOptions = {spawn: true};
 const defaultLocale = 'en_US';
 
 function getEnvLocale(env) {
@@ -20,8 +20,8 @@ function parseLocale(x) {
 	return getEnvLocale(env);
 }
 
-function getLocale(str) {
-	return (str && str.replace(/[.:].*/, ''));
+function getLocale(string) {
+	return (string && string.replace(/[.:].*/, ''));
 }
 
 function getAppleLocale() {
@@ -58,17 +58,16 @@ function getWinLocale() {
 }
 
 function getWinLocaleSync() {
-	const stdout = execa.sync('wmic', ['os', 'get', 'locale']).stdout;
+	const {stdout} = execa.sync('wmic', ['os', 'get', 'locale']);
 	const lcidCode = parseInt(stdout.replace('Locale', ''), 16);
 	return lcid.from(lcidCode);
 }
 
-module.exports = mem(opts => {
-	opts = opts || defaultOpts;
+module.exports = mem((options = defaultOptions) => {
 	const envLocale = getEnvLocale();
-	let thenable;
 
-	if (envLocale || opts.spawn === false) {
+	let thenable;
+	if (envLocale || options.spawn === false) {
 		thenable = Promise.resolve(getLocale(envLocale));
 	} else if (process.platform === 'win32') {
 		thenable = getWinLocale();
@@ -80,12 +79,11 @@ module.exports = mem(opts => {
 		.catch(() => defaultLocale);
 });
 
-module.exports.sync = mem(opts => {
-	opts = opts || defaultOpts;
+module.exports.sync = mem((options = defaultOptions) => {
 	const envLocale = getEnvLocale();
-	let res;
 
-	if (envLocale || opts.spawn === false) {
+	let res;
+	if (envLocale || options.spawn === false) {
 		res = getLocale(envLocale);
 	} else {
 		try {
@@ -94,7 +92,7 @@ module.exports.sync = mem(opts => {
 			} else {
 				res = getUnixLocaleSync();
 			}
-		} catch (err) {}
+		} catch (_) {}
 	}
 
 	return res || defaultLocale;

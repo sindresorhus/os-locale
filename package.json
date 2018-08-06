@@ -10,7 +10,7 @@
     "url": "sindresorhus.com"
   },
   "engines": {
-    "node": ">=4"
+    "node": ">=6"
   },
   "scripts": {
     "test": "xo && ava"
@@ -33,9 +33,9 @@
     "region"
   ],
   "dependencies": {
-    "execa": "^0.7.0",
-    "lcid": "^1.0.0",
-    "mem": "^1.1.0"
+    "execa": "^0.10.0",
+    "lcid": "^2.0.0",
+    "mem": "^3.0.1"
   },
   "devDependencies": {
     "ava": "*",
