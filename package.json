@@ -35,7 +35,7 @@
   "dependencies": {
     "execa": "^0.10.0",
     "lcid": "^2.0.0",
-    "mem": "^3.0.1"
+    "mem": "^4.0.0"
   },
   "devDependencies": {
     "ava": "*",
