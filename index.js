@@ -24,12 +24,30 @@ function getLocale(string) {
 	return (string && string.replace(/[.:].*/, ''));
 }
 
+function getLocales() {
+	return execa.stdout('locale', ['-a']);
+}
+
+function getLocalesSync() {
+	return execa.sync('locale', ['-a']).stdout;
+}
+
+function getSupportedLocale(locale, locales = '') {
+	return locales.indexOf(locale) !== -1 ? locale : defaultLocale
+}
+
 function getAppleLocale() {
-	return execa.stdout('defaults', ['read', '-g', 'AppleLocale']);
+	return Promise.all(
+		execa.stdout('defaults', ['read', '-g', 'AppleLocale']),
+		getLocales(),
+	).then(results => getSupportedLocale(results[0], results[1]))
 }
 
 function getAppleLocaleSync() {
-	return execa.sync('defaults', ['read', '-g', 'AppleLocale']).stdout;
+	return getSupportedLocale(
+		execa.sync('defaults', ['read', '-g', 'AppleLocale']).stdout,
+		getLocalesSync()
+	)
 }
 
 function getUnixLocale() {
