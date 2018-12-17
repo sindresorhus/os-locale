@@ -1,9 +1,12 @@
+import path from 'path';
 import execa from 'execa';
 import test from 'ava';
 import importFresh from 'import-fresh';
 
 const envVars = ['LC_ALL', 'LANGUAGE', 'LANG', 'LC_MESSAGES'];
 const expectedFallback = 'en_US';
+
+const mainPath = path.resolve(__dirname, 'index.js');
 
 function unsetEnvVars(cache) {
 	for (const envVar of envVars) {
@@ -23,14 +26,14 @@ function restoreEnvVars(cache) {
 }
 
 test('async', async t => {
-	const locale = await importFresh('.')();
+	const locale = await importFresh(mainPath)();
 	console.log('Locale identifier:', locale);
 	t.true(locale.length > 1);
 	t.true(locale.includes('_'));
 });
 
 test('sync', t => {
-	const locale = importFresh('.').sync();
+	const locale = importFresh(mainPath).sync();
 	console.log('Locale identifier:', locale);
 	t.true(locale.length > 1);
 	t.true(locale.includes('_'));
@@ -53,7 +56,7 @@ test('async without spawn', async t => {
 	};
 
 	// Test async method
-	const locale = await importFresh('.')({spawn: false});
+	const locale = await importFresh(mainPath)({spawn: false});
 	console.log('Locale identifier:', locale);
 	afterTest();
 	t.is(locale, expectedFallback, 'Locale did not match expected fallback');
@@ -73,7 +76,7 @@ test('sync without spawn', t => {
 	};
 
 	// Test sync method
-	const locale = importFresh('.').sync({spawn: false});
+	const locale = importFresh(mainPath).sync({spawn: false});
 	console.log('Locale identifier:', locale);
 	t.is(locale, expectedFallback, 'Locale did not match expected fallback');
 
