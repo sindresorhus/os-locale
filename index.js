@@ -33,21 +33,21 @@ function getLocalesSync() {
 }
 
 function getSupportedLocale(locale, locales = '') {
-	return locales.indexOf(locale) !== -1 ? locale : defaultLocale
+	return locales.indexOf(locale) === -1 ? defaultLocale : locale;
 }
 
 function getAppleLocale() {
-	return Promise.all(
+	return Promise.all([
 		execa.stdout('defaults', ['read', '-g', 'AppleLocale']),
-		getLocales(),
-	).then(results => getSupportedLocale(results[0], results[1]))
+		getLocales()
+	]).then(results => getSupportedLocale(results[0], results[1]));
 }
 
 function getAppleLocaleSync() {
 	return getSupportedLocale(
 		execa.sync('defaults', ['read', '-g', 'AppleLocale']).stdout,
 		getLocalesSync()
-	)
+	);
 }
 
 function getUnixLocale() {
