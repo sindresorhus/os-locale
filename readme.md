@@ -61,6 +61,11 @@ Default: `true`
 Set to `false` to avoid spawning subprocesses and instead only resolve the locale from environment variables.
 
 
+## Security
+
+To report a security vulnerability, please use the [Tidelift security contact](https://tidelift.com/security). Tidelift will coordinate the fix and disclosure.
+
+
 ## License
 
 MIT © [Sindre Sorhus](https://sindresorhus.com)
