@@ -6,17 +6,17 @@ const mem = require('mem');
 const defaultOptions = {spawn: true};
 const defaultLocale = 'en_US';
 
-function getEnvLocale(env) {
-	env = env || process.env;
+function getEnvLocale(env = process.env) {
 	return env.LC_ALL || env.LC_MESSAGES || env.LANG || env.LANGUAGE;
 }
 
-function parseLocale(x) {
-	const env = x.split('\n').reduce((env, def) => {
-		def = def.split('=');
-		env[def[0]] = def[1].replace(/^"|"$/g, '');
+function parseLocale(string) {
+	const env = string.split('\n').reduce((env, def) => {
+		const [key, value] = def.split('=');
+		env[key] = value.replace(/^"|"$/g, '');
 		return env;
 	}, {});
+
 	return getEnvLocale(env);
 }
 
@@ -25,11 +25,11 @@ function getLocale(string) {
 }
 
 function getAppleLocale() {
-	return execa.stdout('defaults', ['read', '-g', 'AppleLocale']);
+	return execa.stdout('defaults', ['read', '-globalDomain', 'AppleLocale']);
 }
 
 function getAppleLocaleSync() {
-	return execa.sync('defaults', ['read', '-g', 'AppleLocale']).stdout;
+	return execa.sync('defaults', ['read', '-globalDomain', 'AppleLocale']).stdout;
 }
 
 function getUnixLocale() {
@@ -75,7 +75,8 @@ module.exports = mem((options = defaultOptions) => {
 		thenable = getUnixLocale();
 	}
 
-	return thenable.then(locale => locale || defaultLocale)
+	return thenable
+		.then(locale => locale || defaultLocale)
 		.catch(() => defaultLocale);
 });
 
@@ -87,11 +88,7 @@ module.exports.sync = mem((options = defaultOptions) => {
 		res = getLocale(envLocale);
 	} else {
 		try {
-			if (process.platform === 'win32') {
-				res = getWinLocaleSync();
-			} else {
-				res = getUnixLocaleSync();
-			}
+			res = process.platform === 'win32' ? getWinLocaleSync() : getUnixLocaleSync();
 		} catch (_) {}
 	}
 
