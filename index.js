@@ -38,7 +38,7 @@ function getSupportedLocale(locale, locales = '') {
 
 function getAppleLocale() {
 	return Promise.all([
-		execa.stdout('defaults', ['read', '-g', 'AppleLocale']),
+		execa.stdout('defaults', ['read', '-globalDomain', 'AppleLocale']),
 		getLocales()
 	]).then(results => getSupportedLocale(results[0], results[1]));
 }
