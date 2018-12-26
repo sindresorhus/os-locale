@@ -33,7 +33,7 @@ function getLocalesSync() {
 }
 
 function getSupportedLocale(locale, locales = '') {
-	return locales.indexOf(locale) === -1 ? defaultLocale : locale;
+	return locales.includes(locale) ? locale : defaultLocale;
 }
 
 function getAppleLocale() {
