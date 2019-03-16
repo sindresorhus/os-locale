@@ -1,6 +1,6 @@
 'use strict';
+const path = require('path');
 const execa = require('execa');
-const lcid = require('lcid');
 const mem = require('mem');
 
 const defaultOptions = {spawn: true};
@@ -68,17 +68,13 @@ function getUnixLocaleSync() {
 }
 
 function getWinLocale() {
-	return execa.stdout('wmic', ['os', 'get', 'locale'])
-		.then(stdout => {
-			const lcidCode = parseInt(stdout.replace('Locale', ''), 16);
-			return lcid.from(lcidCode);
-		});
+	return execa.stdout(path.join(__dirname, 'locale.exe'))
+		.then(stdout => stdout.replace(/-/, '_'));
 }
 
 function getWinLocaleSync() {
-	const {stdout} = execa.sync('wmic', ['os', 'get', 'locale']);
-	const lcidCode = parseInt(stdout.replace('Locale', ''), 16);
-	return lcid.from(lcidCode);
+	const {stdout} = execa.sync(path.join(__dirname, 'locale.exe'));
+	return stdout.replace(/-/, '_');
 }
 
 module.exports = mem((options = defaultOptions) => {
