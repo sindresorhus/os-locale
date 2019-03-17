@@ -11,8 +11,8 @@ function getEnvLocale(env = process.env) {
 }
 
 function parseLocale(string) {
-	const env = string.split('\n').reduce((env, def) => {
-		const [key, value] = def.split('=');
+	const env = string.split('\n').reduce((env, definition) => {
+		const [key, value] = definition.split('=');
 		env[key] = value.replace(/^"|"$/g, '');
 		return env;
 	}, {});
@@ -36,11 +36,13 @@ function getSupportedLocale(locale, locales = '') {
 	return locales.includes(locale) ? locale : defaultLocale;
 }
 
-function getAppleLocale() {
-	return Promise.all([
+async function getAppleLocale() {
+	const results = await Promise.all([
 		execa.stdout('defaults', ['read', '-globalDomain', 'AppleLocale']),
 		getLocales()
-	]).then(results => getSupportedLocale(results[0], results[1]));
+	]);
+
+	return getSupportedLocale(results[0], results[1]);
 }
 
 function getAppleLocaleSync() {
@@ -50,13 +52,12 @@ function getAppleLocaleSync() {
 	);
 }
 
-function getUnixLocale() {
+async function getUnixLocale() {
 	if (process.platform === 'darwin') {
 		return getAppleLocale();
 	}
 
-	return execa.stdout('locale')
-		.then(stdout => getLocale(parseLocale(stdout)));
+	return getLocale(parseLocale(await execa.stdout('locale')));
 }
 
 function getUnixLocaleSync() {
@@ -67,12 +68,10 @@ function getUnixLocaleSync() {
 	return getLocale(parseLocale(execa.sync('locale').stdout));
 }
 
-function getWinLocale() {
-	return execa.stdout('wmic', ['os', 'get', 'locale'])
-		.then(stdout => {
-			const lcidCode = parseInt(stdout.replace('Locale', ''), 16);
-			return lcid.from(lcidCode);
-		});
+async function getWinLocale() {
+	const stdout = await execa.stdout('wmic', ['os', 'get', 'locale']);
+	const lcidCode = parseInt(stdout.replace('Locale', ''), 16);
+	return lcid.from(lcidCode);
 }
 
 function getWinLocaleSync() {
@@ -81,34 +80,39 @@ function getWinLocaleSync() {
 	return lcid.from(lcidCode);
 }
 
-module.exports = mem((options = defaultOptions) => {
+const osLocale = mem(async (options = defaultOptions) => {
 	const envLocale = getEnvLocale();
 
-	let thenable;
-	if (envLocale || options.spawn === false) {
-		thenable = Promise.resolve(getLocale(envLocale));
-	} else if (process.platform === 'win32') {
-		thenable = getWinLocale();
-	} else {
-		thenable = getUnixLocale();
-	}
+	try {
+		let locale;
+		if (envLocale || options.spawn === false) {
+			locale = getLocale(envLocale);
+		} else if (process.platform === 'win32') {
+			locale = await getWinLocale();
+		} else {
+			locale = await getUnixLocale();
+		}
 
-	return thenable
-		.then(locale => locale || defaultLocale)
-		.catch(() => defaultLocale);
+		return locale || defaultLocale;
+	} catch (_) {
+		return defaultLocale;
+	}
 });
+
+module.exports = osLocale;
+module.exports.default = osLocale;
 
 module.exports.sync = mem((options = defaultOptions) => {
 	const envLocale = getEnvLocale();
 
-	let res;
+	let result;
 	if (envLocale || options.spawn === false) {
-		res = getLocale(envLocale);
+		result = getLocale(envLocale);
 	} else {
 		try {
-			res = process.platform === 'win32' ? getWinLocaleSync() : getUnixLocaleSync();
+			result = process.platform === 'win32' ? getWinLocaleSync() : getUnixLocaleSync();
 		} catch (_) {}
 	}
 
-	return res || defaultLocale;
+	return result || defaultLocale;
 });
