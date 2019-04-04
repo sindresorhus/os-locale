@@ -1,10 +1,12 @@
-export interface Options {
-	/**
-	Set to `false` to avoid spawning subprocesses and instead only resolve the locale from environment variables.
+declare namespace osLocale {
+	interface Options {
+		/**
+		Set to `false` to avoid spawning subprocesses and instead only resolve the locale from environment variables.
 
-	@default true
-	*/
-	readonly spawn?: boolean;
+		@default true
+		*/
+		readonly spawn?: boolean;
+	}
 }
 
 declare const osLocale: {
@@ -12,15 +14,25 @@ declare const osLocale: {
 	Get the system [locale](https://en.wikipedia.org/wiki/Locale_(computer_software)).
 
 	@returns The locale.
+
+	@example
+	```
+	import osLocale = require('os-locale');
+
+	(async () => {
+		console.log(await osLocale());
+		//=> 'en_US'
+	})();
+	```
 	*/
-	(options?: Options): Promise<string>;
+	(options?: osLocale.Options): Promise<string>;
 
 	/**
 	Synchronously get the system [locale](https://en.wikipedia.org/wiki/Locale_(computer_software)).
 
 	@returns The locale.
 	*/
-	sync(options?: Options): string;
+	sync(options?: osLocale.Options): string;
 };
 
-export default osLocale;
+export = osLocale;

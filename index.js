@@ -100,7 +100,6 @@ const osLocale = mem(async (options = defaultOptions) => {
 });
 
 module.exports = osLocale;
-module.exports.default = osLocale;
 
 module.exports.sync = mem((options = defaultOptions) => {
 	const envLocale = getEnvLocale();

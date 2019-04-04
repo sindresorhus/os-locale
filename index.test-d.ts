@@ -1,5 +1,5 @@
-import {expectType} from 'tsd-check';
-import osLocale from '.';
+import {expectType} from 'tsd';
+import osLocale = require('.');
 
 expectType<Promise<string>>(osLocale());
 expectType<Promise<string>>(osLocale({spawn: false}));
