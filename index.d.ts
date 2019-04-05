@@ -21,7 +21,7 @@ declare const osLocale: {
 
 	(async () => {
 		console.log(await osLocale());
-		//=> 'en_US'
+		//=> 'en-US'
 	})();
 	```
 	*/

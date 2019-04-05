@@ -3,7 +3,7 @@ import test from 'ava';
 import importFresh from 'import-fresh';
 
 const envVars = ['LC_ALL', 'LANGUAGE', 'LANG', 'LC_MESSAGES'];
-const expectedFallback = 'en_US';
+const expectedFallback = 'en-US';
 
 function unsetEnvVars(cache) {
 	for (const envVar of envVars) {
@@ -26,14 +26,14 @@ test('async', async t => {
 	const locale = await importFresh('.')();
 	console.log('Locale identifier:', locale);
 	t.true(locale.length > 1);
-	t.true(locale.includes('_'));
+	t.true(locale.includes('-'));
 });
 
 test('sync', t => {
 	const locale = importFresh('.').sync();
 	console.log('Locale identifier:', locale);
 	t.true(locale.length > 1);
-	t.true(locale.includes('_'));
+	t.true(locale.includes('-'));
 });
 
 test('async without spawn', async t => {

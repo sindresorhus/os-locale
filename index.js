@@ -4,7 +4,7 @@ const lcid = require('lcid');
 const mem = require('mem');
 
 const defaultOptions = {spawn: true};
-const defaultLocale = 'en_US';
+const defaultLocale = 'en-US';
 
 function getEnvLocale(env = process.env) {
 	return env.LC_ALL || env.LC_MESSAGES || env.LANG || env.LANGUAGE;
@@ -24,7 +24,7 @@ function getLocale(string) {
 	return (string && string.replace(/[.:].*/, ''));
 }
 
-function getLocales() {
+async function getLocales() {
 	return execa.stdout('locale', ['-a']);
 }
 
@@ -81,10 +81,10 @@ function getWinLocaleSync() {
 }
 
 const osLocale = mem(async (options = defaultOptions) => {
-	const envLocale = getEnvLocale();
-
+	let locale;
 	try {
-		let locale;
+		const envLocale = getEnvLocale();
+
 		if (envLocale || options.spawn === false) {
 			locale = getLocale(envLocale);
 		} else if (process.platform === 'win32') {
@@ -92,26 +92,26 @@ const osLocale = mem(async (options = defaultOptions) => {
 		} else {
 			locale = await getUnixLocale();
 		}
+	} catch (_) {}
 
-		return locale || defaultLocale;
-	} catch (_) {
-		return defaultLocale;
-	}
+	return (locale || defaultLocale).replace(/_/, '-');
 });
 
 module.exports = osLocale;
 
 module.exports.sync = mem((options = defaultOptions) => {
-	const envLocale = getEnvLocale();
+	let locale;
+	try {
+		const envLocale = getEnvLocale();
 
-	let result;
-	if (envLocale || options.spawn === false) {
-		result = getLocale(envLocale);
-	} else {
-		try {
-			result = process.platform === 'win32' ? getWinLocaleSync() : getUnixLocaleSync();
-		} catch (_) {}
-	}
+		if (envLocale || options.spawn === false) {
+			locale = getLocale(envLocale);
+		} else if (process.platform === 'win32') {
+			locale = getWinLocaleSync();
+		} else {
+			locale = getUnixLocaleSync();
+		}
+	} catch (_) {}
 
-	return result || defaultLocale;
+	return (locale || defaultLocale).replace(/_/, '-');
 });
