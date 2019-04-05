@@ -10,13 +10,14 @@
 		"url": "sindresorhus.com"
 	},
 	"engines": {
-		"node": ">=6"
+		"node": ">=8"
 	},
 	"scripts": {
-		"test": "xo && ava"
+		"test": "xo && ava && tsd"
 	},
 	"files": [
-		"index.js"
+		"index.js",
+		"index.d.ts"
 	],
 	"keywords": [
 		"locale",
@@ -35,11 +36,12 @@
 	"dependencies": {
 		"execa": "^1.0.0",
 		"lcid": "^2.0.0",
-		"mem": "^4.0.0"
+		"mem": "^4.3.0"
 	},
 	"devDependencies": {
-		"ava": "^1.0.1",
+		"ava": "^1.4.1",
 		"import-fresh": "^3.0.0",
-		"xo": "^0.23.0"
+		"tsd": "^0.7.2",
+		"xo": "^0.24.0"
 	}
 }
