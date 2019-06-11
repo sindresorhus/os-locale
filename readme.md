@@ -28,11 +28,11 @@ const osLocale = require('os-locale');
 
 ## API
 
-### osLocale([options])
+### osLocale(options?)
 
 Returns a `Promise` for the locale.
 
-### osLocale.sync([options])
+### osLocale.sync(options?)
 
 Returns the locale.
 

@@ -95,7 +95,7 @@ const osLocale = mem(async (options = defaultOptions) => {
 	} catch (_) {}
 
 	return (locale || defaultLocale).replace(/_/, '-');
-});
+}, {cachePromiseRejection: false});
 
 module.exports = osLocale;
 

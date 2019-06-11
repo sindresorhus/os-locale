@@ -35,11 +35,11 @@
 	],
 	"dependencies": {
 		"execa": "^1.0.0",
-		"lcid": "^2.0.0",
-		"mem": "^4.3.0"
+		"lcid": "^3.0.0",
+		"mem": "^5.0.0"
 	},
 	"devDependencies": {
-		"ava": "^1.4.1",
+		"ava": "^2.1.0",
 		"import-fresh": "^3.0.0",
 		"tsd": "^0.7.2",
 		"xo": "^0.24.0"
