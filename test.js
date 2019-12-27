@@ -5,18 +5,18 @@ const proxyquire = proxyquireBase.noPreserveCache().noCallThru();
 
 const expectedFallback = 'en-US';
 
-const noExeca = t => ({
-	stdout: async () => t.fail('Execa should not be called'),
-	sync: () => t.fail('Execa should not be called')
-});
+const noExeca = t => {
+	const fn = () => t.fail('Execa should not be called');
+	fn.stdout = async () => t.fail('Execa should not be called');
+
+	return fn;
+};
 
 const syncExeca = callback => ({
 	sync: (...args) => ({stdout: callback(...args)})
 });
 
-const asyncExeca = callback => ({
-	stdout: async (...args) => callback(...args)
-});
+const asyncExeca = callback => async (...args) => ({stdout: callback(...args)});
 
 const setPlatform = platform => {
 	Object.defineProperty(process, 'platform', {value: platform});
