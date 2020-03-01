@@ -93,7 +93,7 @@ const osLocale = mem(async (options = defaultOptions) => {
 		const envLocale = getEnvLocale();
 
 		if (envLocale || options.spawn === false) {
-			locale = await getLocale(envLocale);
+			locale = getLocale(envLocale);
 		} else if (process.platform === 'win32') {
 			locale = await getWinLocale();
 		} else if (process.platform === 'darwin') {
