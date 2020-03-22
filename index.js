@@ -7,7 +7,7 @@ const defaultOptions = {spawn: true};
 const defaultLocale = 'en-US';
 
 async function getStdOut(command, args) {
-	return execa.stdout(command, args);
+	return (await execa(command, args)).stdout;
 }
 
 function getStdOutSync(command, args) {
