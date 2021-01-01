@@ -1,4 +1,4 @@
-# os-locale [![Build Status](https://travis-ci.org/sindresorhus/os-locale.svg?branch=master)](https://travis-ci.org/sindresorhus/os-locale)
+# os-locale
 
 > Get the system [locale](https://en.wikipedia.org/wiki/Locale_(computer_software))
 
