@@ -19,11 +19,11 @@ function getEnvLocale(env = process.env) {
 }
 
 function parseLocale(string) {
-	const env = string.split('\n').reduce((env, definition) => {
+	const env = {};
+	for (const definition of string.split('\n')) {
 		const [key, value] = definition.split('=');
 		env[key] = value.replace(/^"|"$/g, '');
-		return env;
-	}, {});
+	}
 
 	return getEnvLocale(env);
 }
@@ -70,14 +70,14 @@ function getUnixLocaleSync() {
 
 async function getWinLocale() {
 	const stdout = await getStdOut('wmic', ['os', 'get', 'locale']);
-	const lcidCode = parseInt(stdout.replace('Locale', ''), 16);
+	const lcidCode = Number.parseInt(stdout.replace('Locale', ''), 16);
 
 	return lcid.from(lcidCode);
 }
 
 function getWinLocaleSync() {
 	const stdout = getStdOutSync('wmic', ['os', 'get', 'locale']);
-	const lcidCode = parseInt(stdout.replace('Locale', ''), 16);
+	const lcidCode = Number.parseInt(stdout.replace('Locale', ''), 16);
 
 	return lcid.from(lcidCode);
 }
@@ -101,7 +101,7 @@ const osLocale = mem(async (options = defaultOptions) => {
 		} else {
 			locale = await getUnixLocale();
 		}
-	} catch (_) {}
+	} catch {}
 
 	return normalise(locale || defaultLocale);
 }, {cachePromiseRejection: false});
@@ -122,7 +122,7 @@ module.exports.sync = mem((options = defaultOptions) => {
 		} else {
 			locale = getUnixLocaleSync();
 		}
-	} catch (_) {}
+	} catch {}
 
 	return normalise(locale || defaultLocale);
 });
