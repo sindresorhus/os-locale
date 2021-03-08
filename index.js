@@ -69,14 +69,14 @@ function getUnixLocaleSync() {
 
 async function getWinLocale() {
 	const stdout = await getStdOut('wmic', ['os', 'get', 'locale']);
-	const lcidCode = Number.parseInt(stdout.replace('Locale', ''), 16);
+	const lcidCode = parseInt(stdout.replace('Locale', ''), 16);
 
 	return lcid.from(lcidCode);
 }
 
 function getWinLocaleSync() {
 	const stdout = getStdOutSync('wmic', ['os', 'get', 'locale']);
-	const lcidCode = Number.parseInt(stdout.replace('Locale', ''), 16);
+	const lcidCode = parseInt(stdout.replace('Locale', ''), 16);
 
 	return lcid.from(lcidCode);
 }
@@ -107,14 +107,14 @@ module.exports = async (options = defaultOptions) => {
 		} else {
 			locale = await getUnixLocale();
 		}
-	} catch {}
+	} catch (_) {}
 
 	const normalised = normalise(locale || defaultLocale);
 	asyncCache.set(options.spawn, normalised);
 	return normalised;
 };
 
-const syncCache = new Map();
+const syncCache = {};
 
 module.exports.sync = (options = defaultOptions) => {
 	if (syncCache.has(options.spawn)) {
@@ -134,7 +134,7 @@ module.exports.sync = (options = defaultOptions) => {
 		} else {
 			locale = getUnixLocaleSync();
 		}
-	} catch {}
+	} catch (_) {}
 
 	const normalised = normalise(locale || defaultLocale);
 	syncCache.set(options.spawn, normalised);
