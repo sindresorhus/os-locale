@@ -69,14 +69,14 @@ function getUnixLocaleSync() {
 
 async function getWinLocale() {
 	const stdout = await getStdOut('wmic', ['os', 'get', 'locale']);
-	const lcidCode = parseInt(stdout.replace('Locale', ''), 16);
+	const lcidCode = Number.parseInt(stdout.replace('Locale', ''), 16);
 
 	return lcid.from(lcidCode);
 }
 
 function getWinLocaleSync() {
 	const stdout = getStdOutSync('wmic', ['os', 'get', 'locale']);
-	const lcidCode = parseInt(stdout.replace('Locale', ''), 16);
+	const lcidCode = Number.parseInt(stdout.replace('Locale', ''), 16);
 
 	return lcid.from(lcidCode);
 }
@@ -85,11 +85,12 @@ function normalise(input) {
 	return input.replace(/_/, '-');
 }
 
-const asyncCache = {};
+// Uses simple map as a simple memoization technique without having to import `mem`
+const asyncCache = new Map();
 
 module.exports = async (options = defaultOptions) => {
-	if (asyncCache[options.spawn]) {
-		return asyncCache[options.spawn];
+	if (asyncCache.has(options.spawn)) {
+		return asyncCache.get(options.spawn);
 	}
 
 	let locale;
@@ -106,18 +107,18 @@ module.exports = async (options = defaultOptions) => {
 		} else {
 			locale = await getUnixLocale();
 		}
-	} catch (_) {}
+	} catch {}
 
 	const normalised = normalise(locale || defaultLocale);
-	asyncCache[options.spawn] = normalised;
+	asyncCache.set(options.spawn, normalised);
 	return normalised;
 };
 
-const syncCache = {};
+const syncCache = new Map();
 
 module.exports.sync = (options = defaultOptions) => {
-	if (syncCache[options.spawn]) {
-		return syncCache[options.spawn];
+	if (syncCache.has(options.spawn)) {
+		return syncCache.get(options.spawn);
 	}
 
 	let locale;
@@ -133,9 +134,9 @@ module.exports.sync = (options = defaultOptions) => {
 		} else {
 			locale = getUnixLocaleSync();
 		}
-	} catch (_) {}
+	} catch {}
 
 	const normalised = normalise(locale || defaultLocale);
-	syncCache[options.spawn] = normalised;
+	syncCache.set(options.spawn, normalised);
 	return normalised;
 };
