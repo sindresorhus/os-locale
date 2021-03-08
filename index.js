@@ -1,7 +1,6 @@
 'use strict';
 const execa = require('execa');
 const lcid = require('lcid');
-const mem = require('mem');
 
 const defaultOptions = {spawn: true};
 const defaultLocale = 'en-US';
@@ -86,7 +85,13 @@ function normalise(input) {
 	return input.replace(/_/, '-');
 }
 
-const osLocale = mem(async (options = defaultOptions) => {
+const asyncCache = {};
+
+module.exports = async (options = defaultOptions) => {
+	if (asyncCache[options.spawn]) {
+		return asyncCache[options.spawn];
+	}
+
 	let locale;
 
 	try {
@@ -103,12 +108,18 @@ const osLocale = mem(async (options = defaultOptions) => {
 		}
 	} catch (_) {}
 
-	return normalise(locale || defaultLocale);
-}, {cachePromiseRejection: false});
+	const normalised = normalise(locale || defaultLocale);
+	asyncCache[options.spawn] = normalised;
+	return normalised;
+};
 
-module.exports = osLocale;
+const syncCache = {};
 
-module.exports.sync = mem((options = defaultOptions) => {
+module.exports.sync = (options = defaultOptions) => {
+	if (syncCache[options.spawn]) {
+		return syncCache[options.spawn];
+	}
+
 	let locale;
 	try {
 		const envLocale = getEnvLocale();
@@ -124,5 +135,7 @@ module.exports.sync = mem((options = defaultOptions) => {
 		}
 	} catch (_) {}
 
-	return normalise(locale || defaultLocale);
-});
+	const normalised = normalise(locale || defaultLocale);
+	syncCache[options.spawn] = normalised;
+	return normalised;
+};
