@@ -19,11 +19,11 @@ function getEnvLocale(env = process.env) {
 }
 
 function parseLocale(string) {
-	const env = string.split('\n').reduce((env, definition) => {
+	const env = {};
+	for (const definition of string.split('\n')) {
 		const [key, value] = definition.split('=');
 		env[key] = value.replace(/^"|"$/g, '');
-		return env;
-	}, {});
+	}
 
 	return getEnvLocale(env);
 }
