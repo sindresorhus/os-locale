@@ -114,7 +114,7 @@ module.exports = async (options = defaultOptions) => {
 	return normalised;
 };
 
-const syncCache = {};
+const syncCache = new Map();
 
 module.exports.sync = (options = defaultOptions) => {
 	if (syncCache.has(options.spawn)) {
