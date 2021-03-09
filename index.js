@@ -85,7 +85,7 @@ function normalise(input) {
 	return input.replace(/_/, '-');
 }
 
-// Uses simple map as a simple memoization technique without having to import `mem`
+// Uses a map as a simple memoization technique without having to import `mem`
 const asyncCache = new Map();
 
 module.exports = async (options = defaultOptions) => {
