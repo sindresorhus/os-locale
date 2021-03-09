@@ -1,7 +1,6 @@
 'use strict';
 const execa = require('execa');
 const lcid = require('lcid');
-const mem = require('mem');
 
 const defaultOptions = {spawn: true};
 const defaultLocale = 'en-US';
@@ -86,7 +85,14 @@ function normalise(input) {
 	return input.replace(/_/, '-');
 }
 
-const osLocale = mem(async (options = defaultOptions) => {
+// Uses a map as a simple memoization technique without having to import `mem`
+const asyncCache = new Map();
+
+module.exports = async (options = defaultOptions) => {
+	if (asyncCache.has(options.spawn)) {
+		return asyncCache.get(options.spawn);
+	}
+
 	let locale;
 
 	try {
@@ -103,12 +109,18 @@ const osLocale = mem(async (options = defaultOptions) => {
 		}
 	} catch {}
 
-	return normalise(locale || defaultLocale);
-}, {cachePromiseRejection: false});
+	const normalised = normalise(locale || defaultLocale);
+	asyncCache.set(options.spawn, normalised);
+	return normalised;
+};
 
-module.exports = osLocale;
+const syncCache = new Map();
 
-module.exports.sync = mem((options = defaultOptions) => {
+module.exports.sync = (options = defaultOptions) => {
+	if (syncCache.has(options.spawn)) {
+		return syncCache.get(options.spawn);
+	}
+
 	let locale;
 	try {
 		const envLocale = getEnvLocale();
@@ -124,5 +136,7 @@ module.exports.sync = mem((options = defaultOptions) => {
 		}
 	} catch {}
 
-	return normalise(locale || defaultLocale);
-});
+	const normalised = normalise(locale || defaultLocale);
+	syncCache.set(options.spawn, normalised);
+	return normalised;
+};
