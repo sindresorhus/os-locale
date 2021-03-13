@@ -85,12 +85,11 @@ function normalise(input) {
 	return input.replace(/_/, '-');
 }
 
-// Uses a map as a simple memoization technique without having to import `mem`
-const asyncCache = new Map();
+const cache = new Map();
 
 module.exports = async (options = defaultOptions) => {
-	if (asyncCache.has(options.spawn)) {
-		return asyncCache.get(options.spawn);
+	if (cache.has(options.spawn)) {
+		return cache.get(options.spawn);
 	}
 
 	let locale;
@@ -114,11 +113,9 @@ module.exports = async (options = defaultOptions) => {
 	return normalised;
 };
 
-const syncCache = new Map();
-
 module.exports.sync = (options = defaultOptions) => {
-	if (syncCache.has(options.spawn)) {
-		return syncCache.get(options.spawn);
+	if (cache.has(options.spawn)) {
+		return cache.get(options.spawn);
 	}
 
 	let locale;
