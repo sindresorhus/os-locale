@@ -109,7 +109,7 @@ module.exports = async (options = defaultOptions) => {
 	} catch {}
 
 	const normalised = normalise(locale || defaultLocale);
-	asyncCache.set(options.spawn, normalised);
+	cache.set(options.spawn, normalised);
 	return normalised;
 };
 
@@ -134,6 +134,6 @@ module.exports.sync = (options = defaultOptions) => {
 	} catch {}
 
 	const normalised = normalise(locale || defaultLocale);
-	syncCache.set(options.spawn, normalised);
+	cache.set(options.spawn, normalised);
 	return normalised;
 };
