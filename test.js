@@ -5,7 +5,7 @@ const proxyquire = proxyquireBase.noPreserveCache().noCallThru();
 
 const expectedFallback = 'en-US';
 
-const execaImport = './execa';
+const execaImport = './execa.js';
 
 const noExeca = t => {
 	const fn = () => t.fail('Execa should not be called');
