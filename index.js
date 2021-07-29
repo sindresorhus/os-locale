@@ -1,5 +1,5 @@
 'use strict';
-const execa = require('execa');
+const execa = require('./execa.js');
 const lcid = require('lcid');
 
 const defaultOptions = {spawn: true};
