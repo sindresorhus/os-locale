@@ -10,24 +10,26 @@
 		"email": "sindresorhus@gmail.com",
 		"url": "https://sindresorhus.com"
 	},
+	"type": "module",
+	"exports": "./index.js",
 	"engines": {
-		"node": ">=10"
+		"node": ">=12.20"
 	},
 	"scripts": {
-		"test": "xo && ava && tsd"
+		"//test": "xo && ava && tsd",
+		"test": "xo && tsd"
 	},
 	"files": [
 		"index.js",
-		"index.d.ts"
+		"index.d.ts",
+		"exec.js"
 	],
 	"keywords": [
 		"locale",
-		"lang",
 		"language",
 		"system",
 		"os",
 		"string",
-		"str",
 		"user",
 		"country",
 		"id",
@@ -35,13 +37,12 @@
 		"region"
 	],
 	"dependencies": {
-		"execa": "^4.0.0",
-		"lcid": "^3.0.0"
+		"lcid": "^3.1.1"
 	},
 	"devDependencies": {
-		"ava": "^2.1.0",
+		"ava": "^3.15.0",
 		"proxyquire": "^2.1.3",
-		"tsd": "^0.11.0",
-		"xo": "^0.38.2"
+		"tsd": "^0.17.0",
+		"xo": "^0.42.0"
 	}
 }

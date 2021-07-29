@@ -1,8 +1,8 @@
 import {expectType} from 'tsd';
-import osLocale = require('.');
+import {osLocale, osLocaleSync} from './index.js';
 
 expectType<Promise<string>>(osLocale());
 expectType<Promise<string>>(osLocale({spawn: false}));
 
-expectType<string>(osLocale.sync());
-expectType<string>(osLocale.sync({spawn: false}));
+expectType<string>(osLocaleSync());
+expectType<string>(osLocaleSync({spawn: false}));

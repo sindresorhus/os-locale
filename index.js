@@ -1,16 +1,15 @@
-'use strict';
-const execa = require('./execa.js');
-const lcid = require('lcid');
+import lcid from 'lcid';
+import {exec, execSync} from './exec.js';
 
 const defaultOptions = {spawn: true};
 const defaultLocale = 'en-US';
 
 async function getStdOut(command, args) {
-	return (await execa(command, args)).stdout;
+	return (await exec(command, args)).stdout;
 }
 
 function getStdOutSync(command, args) {
-	return execa.sync(command, args).stdout;
+	return execSync(command, args).stdout;
 }
 
 function getEnvLocale(env = process.env) {
@@ -46,7 +45,7 @@ function getSupportedLocale(locale, locales = '') {
 async function getAppleLocale() {
 	const results = await Promise.all([
 		getStdOut('defaults', ['read', '-globalDomain', 'AppleLocale']),
-		getLocales()
+		getLocales(),
 	]);
 
 	return getSupportedLocale(results[0], results[1]);
@@ -55,7 +54,7 @@ async function getAppleLocale() {
 function getAppleLocaleSync() {
 	return getSupportedLocale(
 		getStdOutSync('defaults', ['read', '-globalDomain', 'AppleLocale']),
-		getLocalesSync()
+		getLocalesSync(),
 	);
 }
 
@@ -87,7 +86,7 @@ function normalise(input) {
 
 const cache = new Map();
 
-module.exports = async (options = defaultOptions) => {
+export async function osLocale(options = defaultOptions) {
 	if (cache.has(options.spawn)) {
 		return cache.get(options.spawn);
 	}
@@ -111,9 +110,9 @@ module.exports = async (options = defaultOptions) => {
 	const normalised = normalise(locale || defaultLocale);
 	cache.set(options.spawn, normalised);
 	return normalised;
-};
+}
 
-module.exports.sync = (options = defaultOptions) => {
+export function osLocaleSync(options = defaultOptions) {
 	if (cache.has(options.spawn)) {
 		return cache.get(options.spawn);
 	}
@@ -136,4 +135,4 @@ module.exports.sync = (options = defaultOptions) => {
 	const normalised = normalise(locale || defaultLocale);
 	cache.set(options.spawn, normalised);
 	return normalised;
-};
+}

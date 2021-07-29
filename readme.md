@@ -15,12 +15,10 @@ $ npm install os-locale
 ## Usage
 
 ```js
-const osLocale = require('os-locale');
+import {osLocale} from 'os-locale';
 
-(async () => {
-	console.log(await osLocale());
-	//=> 'en-US'
-})();
+console.log(await osLocale());
+//=> 'en-US'
 ```
 ## API
 
