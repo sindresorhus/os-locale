@@ -24,5 +24,8 @@ export async function exec(command, arguments_) {
 @returns {string}
 */
 export function execSync(command, arguments_) {
-	return childProcess.execFileSync(command, arguments_, {encoding: 'utf8'}).trim();
+	return childProcess.execFileSync(command, arguments_, {
+		encoding: 'utf8',
+		stdio: ['ignore', 'pipe', 'ignore'],
+	}).trim();
 }
