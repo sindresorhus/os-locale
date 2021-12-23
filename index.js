@@ -9,7 +9,7 @@ async function getStdOut(command, args) {
 }
 
 function getStdOutSync(command, args) {
-	return execSync(command, args).stdout;
+	return execSync(command, args);
 }
 
 function getEnvLocale(env = process.env) {
