@@ -26,7 +26,7 @@ console.log(await osLocale());
 
 Returns a `Promise` for the locale.
 
-### osLocale.sync(options?)
+### osLocaleSync(options?)
 
 Returns the locale.
 
