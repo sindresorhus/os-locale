@@ -2,47 +2,30 @@
 
 > Get the system [locale](https://en.wikipedia.org/wiki/Locale_(computer_software))
 
+> [!NOTE]
+> You may want [`new Intl.DateTimeFormat().resolvedOptions().locale`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat/resolvedOptions) instead. This package is useful for CLI tools as it also reads locale from environment variables (`LC_ALL`, `LC_MESSAGES`, `LANG`, `LANGUAGE`), which the Intl API does not fully support (it only respects `LC_ALL`).
+
 Useful for localizing your module or app.
 
-POSIX systems: The returned locale refers to the [`LC_MESSAGE`](http://www.gnu.org/software/libc/manual/html_node/Locale-Categories.html#Locale-Categories) category, suitable for selecting the language used in the user interface for message translation.
+POSIX systems: The returned locale refers to the [`LC_MESSAGES`](http://www.gnu.org/software/libc/manual/html_node/Locale-Categories.html#Locale-Categories) category, suitable for selecting the language used in the user interface for message translation.
 
 ## Install
 
-```
-$ npm install os-locale
+```sh
+npm install os-locale
 ```
 
 ## Usage
 
 ```js
-import {osLocale} from 'os-locale';
+import osLocale from 'os-locale';
 
-console.log(await osLocale());
+console.log(osLocale());
 //=> 'en-US'
 ```
+
 ## API
 
-### osLocale(options?)
-
-Returns a `Promise` for the locale.
-
-### osLocaleSync(options?)
+### osLocale()
 
 Returns the locale.
-
-#### options
-
-Type: `object`
-
-##### spawn
-
-Type: `boolean`\
-Default: `true`
-
-Set to `false` to avoid spawning subprocesses and instead only resolve the locale from environment variables.
-
-## os-locale for enterprise
-
-Available as part of the Tidelift Subscription.
-
-The maintainers of os-locale and thousands of other packages are working with Tidelift to deliver commercial support and maintenance for the open source dependencies you use to build your applications. Save time, reduce risk, and improve code health, while paying the maintainers of the exact dependencies you use. [Learn more.](https://tidelift.com/subscription/pkg/npm-os-locale?utm_source=npm-os-locale&utm_medium=referral&utm_campaign=enterprise&utm_term=repo)
